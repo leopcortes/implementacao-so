@@ -42,17 +42,17 @@ class ResourcesManager:
 
             return True
 
-    def release(self, process):
+    def release(self, pid):
         """
         Libera o recurso usado pelo processo
         """
         with self.lock:
-            if self.scanner == process.pid:
+            if self.scanner == pid:
                 self.scanner = None
-            if self.modem == process.pid:
+            if self.modem == pid:
                 self.modem = None
             for i in range(2):
-                if self.printers[i] == process.pid:
+                if self.printers[i] == pid:
                     self.printers[i] = None
-                if self.sata[i] == process.pid:
+                if self.sata[i] == pid:
                     self.sata[i] = None

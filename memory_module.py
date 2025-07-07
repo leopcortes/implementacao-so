@@ -33,15 +33,15 @@ class MemoryManager:
         return -1  # falha na alocação
         
 
-    def deallocate(self, process):
+    def deallocate(self, pid):
         """
         Libera os blocos de memória usados pelo processo atualizando a tabela e o bitmap
         """
-        if process.pid not in self.table:
+        if pid not in self.table:
             return False
 
-        offset, size = self.table[process.pid]
+        offset, size = self.table[pid]
         for i in range(offset, offset + size):
             self.bitmap[i] = 0
-        del self.table[process.pid]
+        del self.table[pid]
         return True
