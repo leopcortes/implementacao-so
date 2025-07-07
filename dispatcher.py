@@ -1,5 +1,7 @@
 from processes_module import Processes
 from queues_module import Queues
+from memory_module import MemoryManager
+from resources_module import ResourcesManager
 
 cpu_total_quantums = 0 #Número de quantums que a CPU já passou
 processing_time = 0 #tempo (em quantums) que o processo tem de CPU
@@ -7,6 +9,8 @@ current_process_in_cpu = False #Atual processo na CPU ou False
 first = False #Usado para marcar quando há a troca de processos na CPU
 
 queues = Queues()
+memory_manager = MemoryManager()
+resource_manager = ResourcesManager()
 
 #TODO
 #Tem que substituir essa parte para obter as informações dos arquivos
@@ -27,6 +31,12 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
   #Coloca na fila de prontos os processos que chegaram com base no cpu_total_quantums
   if len(Processes.processes_that_arrived) > 0:
     for process in Processes.processes_that_arrived:
+      offset = memory_manager.allocate(process)
+      if offset == -1:
+        print(f"[{cpu_total_quantums}] Falha ao alocar memória para P{process.pid}")
+        continue  # não adiciona à fila de prontos
+      process.offset = offset
+
       if not queues.add_process(process, True):
         print("Fila de processos está cheia!")
         break
@@ -38,7 +48,7 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
       if (current_process_in_cpu.processing_time < current_process_in_cpu.total_time):
         queues.add_process(current_process_in_cpu, False)
       else:
-        current_process_in_cpu.close_process()
+        current_process_in_cpu.close_process(memory_manager, resource_manager)
         Queues.count -= 1
 
     current_process_in_cpu = queues.get_next_process()
@@ -47,7 +57,7 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
       current_process_in_cpu.wait_time = 0
 
       #Caso o processo não tenha todos os recursos
-      if (not current_process_in_cpu.get_all_resources()):
+      if (not current_process_in_cpu.get_all_resources(queues, resource_manager)):
         queues.update_user_process_queue()
         processing_time = 0
         cpu_total_quantums += Processes.quantum
