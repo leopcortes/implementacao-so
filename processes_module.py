@@ -1,3 +1,6 @@
+import time
+import threading
+
 class Processes:
   quantum = 1 #milissegundos
   pid = 0
@@ -9,6 +12,7 @@ class Processes:
     self.pid = Processes.pid
     Processes.pid += 1
     self.arrival_time = arrival_time
+    self.offset = None # será atribuido depois de alocar o espaço na memoria
     self.priority = priority
     self.total_time = total_time
     self.processing_time = 0
@@ -44,7 +48,7 @@ class Processes:
     
       dispatcher =>
       PID: {self.pid} 
-      offset: CONECTAR COM O MODULO DE MEMORIA !!!!! #TODO
+      offset: {self.offset}
       blocks: {self.memory_blocks} 
       queue: {self.queue} 
       priority: {self.priority} 
@@ -55,15 +59,35 @@ class Processes:
       modems : {self.modem}
     """
   
-  #TODO
-  def get_all_resources(self):
-    #Tenta obter o recurso. Caso não consiga, coloca o processo na lista de bloqueados (Processes.blocked_processes) e cria a thread que vai chamar a função para tentar obter o recurso. Quando conseguir, chamar a função queues.add_process(*processo) para colocar o processo de volta a lista de prontos e remover da lista de bloqueados.
+  def get_all_resources(self, queues, resource_manager):
+    # Tenta obter o recurso. Caso não consiga, coloca o processo na lista de bloqueados (Processes.blocked_processes) e cria a thread 
+    # que vai chamar a função para tentar obter o recurso. Quando conseguir, chamar a função queues.add_process(*processo) para colocar 
+    # o processo de volta a lista de prontos e remover da lista de bloqueados.
+    if self.priority == 0:
+      return True
+    
+    if resource_manager.allocate(self):
+      return True
+    Processes.blocked_processes.append(self)
 
-    #Colocando na lista de bloqueados
-    #Processes.blocked_processes.append(self)
-    return True
+    def try_allocate():
+      while True:
+        time.sleep(0.01)  # aguarda 10ms
+        if resource_manager.allocate(self):
+          try:
+            Processes.blocked_processes.remove(self)
+          except ValueError:
+            pass
+          queues.add_process(self, is_new=False)
+          break
 
-  #TODO
-  def close_process(self):
-    #Liberar recursos
-    return True
+    # cria e inicia a thread que vai tentar alocar os recursos futuramente
+    t = threading.Thread(target=try_allocate)
+    t.start()
+
+    return False
+
+  def close_process(self, memory_manager, resource_manager):
+    resource_manager.release(self.pid)
+    memory_manager.deallocate(self.pid)
+    

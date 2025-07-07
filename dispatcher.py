@@ -1,6 +1,8 @@
 from processes_module import Processes
 from queues_module import Queues
 from files_module import FileSystem
+from memory_module import MemoryManager
+from resources_module import ResourcesManager
 
 def ler_processos(path):
   processos = []
@@ -35,6 +37,10 @@ def ler_files(path):
 
 Processes.all_processes = ler_processos('entry/processes.txt')
 
+queues = Queues()
+memory_manager = MemoryManager()
+resource_manager = ResourcesManager()
+
 total_blocos, arquivos_existentes, operacoes_arquivo = ler_files('entry/files.txt')
 filesystem = FileSystem(total_blocos)
 filesystem.load_existing_files(arquivos_existentes)
@@ -56,6 +62,12 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
 
   if len(Processes.processes_that_arrived) > 0:
     for process in Processes.processes_that_arrived:
+      offset = memory_manager.allocate(process)
+      if offset == -1:
+        print(f"[{cpu_total_quantums}] Falha ao alocar memória para P{process.pid}")
+        continue  # não adiciona à fila de prontos
+      process.offset = offset
+
       if not queues.add_process(process, True):
         print("Fila de processos está cheia!")
         break
@@ -66,7 +78,7 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
       if current_process_in_cpu.processing_time < current_process_in_cpu.total_time:
         queues.add_process(current_process_in_cpu, False)
       else:
-        current_process_in_cpu.close_process()
+        current_process_in_cpu.close_process(memory_manager, resource_manager)
         Queues.count -= 1
 
     current_process_in_cpu = queues.get_next_process()
@@ -85,7 +97,8 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
 
       current_process_in_cpu.wait_time = 0
 
-      if not current_process_in_cpu.get_all_resources():
+      #Caso o processo não tenha todos os recursos
+      if (not current_process_in_cpu.get_all_resources(queues, resource_manager)):
         queues.update_user_process_queue()
         processing_time = 0
         cpu_total_quantums += Processes.quantum
