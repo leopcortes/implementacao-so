@@ -29,23 +29,20 @@ class Processes:
 
   def get_instructions_status(self, first, last, cpu_total_quantums=0):
     if (first):
-      print(f"""      process {self.pid} =>
-      P{self.pid} STARTED""")
+      print(f"""\nprocess {self.pid} =>""")
+      print(f"""    P{self.pid} STARTED""")
       
-    print(f"""      P{self.pid} instruction {self.processing_time}""")
+    print(f"""    P{self.pid} instruction {self.processing_time}""")
       
     if (last):
-      print(f"""      P{self.pid} return SIGINT
-            
-      Current quantum in CPU: {cpu_total_quantums}
-      """)
+      print(f"""    P{self.pid} return SIGINT\n""")
+      print(f"""    Current quantum in CPU: {cpu_total_quantums}""")
       
   def get_process_status(self):
     print(self) 
 
   def __str__(self):
-    return f"""---------------------- # New process in CPU # ----------------------
-    
+    return f"""
       dispatcher =>
       PID: {self.pid} 
       offset: {self.offset}
