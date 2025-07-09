@@ -5,8 +5,8 @@ Professora Aletéia Patrícia Favacho de Araújo
 
 ## Instruções de Execução
 
-python3 dispatcher.py <txt_files> <txt_processes>
+```python3 dispatcher.py <txt_files> <txt_processes>```
 
 Exemplo:
 
-python3 dispatcher.py entry/files.txt entry/processes.txt
+```python3 dispatcher.py entry/files.txt entry/processes.txt```
