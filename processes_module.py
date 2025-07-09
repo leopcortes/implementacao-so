@@ -84,7 +84,8 @@ class Processes:
 
     return False
 
-  def close_process(self, memory_manager, resource_manager):
+  def close_process(self, memory_manager, resource_manager, queues):
     resource_manager.release(self.pid)
     memory_manager.deallocate(self.pid)
+    queues.remove_process()
     
