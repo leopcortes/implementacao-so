@@ -104,7 +104,7 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
       current_process_in_cpu.wait_time = 0
 
       #Caso o processo não tenha todos os recursos
-      if (not current_process_in_cpu.get_all_resources(queues, resource_manager)):
+      if (not current_process_in_cpu.has_resources and not current_process_in_cpu.get_all_resources(queues, resource_manager)):
         queues.update_user_process_queue()
         processing_time = 0
         cpu_total_quantums += Processes.quantum

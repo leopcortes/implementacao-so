@@ -22,6 +22,7 @@ class Processes:
     self.modem = modem
     self.disk = disk
     self.wait_time = 0
+    self.has_resources = False
     if (priority == 0):
       self.queue = 0
     else:
@@ -64,6 +65,8 @@ class Processes:
       return True
     
     if resource_manager.allocate(self):
+      self.has_resources = True
+      queues.add_process(self, is_new=False)
       return True
     Processes.blocked_processes.append(self)
 
@@ -75,6 +78,7 @@ class Processes:
             Processes.blocked_processes.remove(self)
           except ValueError:
             pass
+          self.has_resources = True
           queues.add_process(self, is_new=False)
           break
 
