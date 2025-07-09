@@ -4,3 +4,9 @@ Trabalho de implementação de um pseudo-SO em Python para a matéria de Sistema
 Professora Aletéia Patrícia Favacho de Araújo
 
 ## Instruções de Execução
+
+python3 dispatcher.py <txt_files> <txt_processes>
+
+Exemplo:
+
+python3 dispatcher.py entry/files.txt entry/processes.txt

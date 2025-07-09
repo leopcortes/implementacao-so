@@ -1,8 +1,15 @@
+import sys
 from processes_module import Processes
 from queues_module import Queues
 from files_module import FileSystem
 from memory_module import MemoryManager
 from resources_module import ResourcesManager
+
+if len(sys.argv) != 3:
+  sys.exit(1)
+
+files_path = sys.argv[1]
+processes_path = sys.argv[2]
 
 def ler_processos(path):
   processos = []
@@ -35,13 +42,13 @@ def ler_files(path):
       operacoes.append({'pid': pid, 'op': 'delete', 'nome': nome})
   return total_blocos, arquivos_existentes, operacoes
 
-Processes.all_processes = ler_processos('entry/processes.txt')
+Processes.all_processes = ler_processos(processes_path)
 
 queues = Queues()
 memory_manager = MemoryManager()
 resource_manager = ResourcesManager()
 
-total_blocos, arquivos_existentes, operacoes_arquivo = ler_files('entry/files.txt')
+total_blocos, arquivos_existentes, operacoes_arquivo = ler_files(files_path)
 filesystem = FileSystem(total_blocos)
 filesystem.load_existing_files(arquivos_existentes)
 
@@ -139,7 +146,7 @@ def blocos_humanos(bloco):
         nums = [str(i) for i in range(inicio, fim)]
         return ', '.join(nums) + f" e {fim}"
 
-print("\nSistema de arquivos =>")
+print("\nSistema de arquivos =>\n")
 for idx, op in enumerate(operacoes_arquivo):
     pid = op['pid']
     process = pid_to_process.get(pid)
@@ -147,27 +154,27 @@ for idx, op in enumerate(operacoes_arquivo):
 
     if op['op'] == 'create':
         if process is None:
-            print(f"Operação {idx+1} => Falha\nO processo {pid} não existe.")
+            print(f"Operação {idx+1} => Falha\nO processo {pid} não existe.\n")
         else:
             success, bloco = filesystem.create_file(op['nome'], op['size'], pid)
             if success:
                 if bloco:
-                    print(f"Operação {idx+1} => Sucesso\nO processo {pid} criou o arquivo {op['nome']} (blocos {blocos_humanos(bloco)}).")
+                    print(f"Operação {idx+1} => Sucesso\nO processo {pid} criou o arquivo {op['nome']} (blocos {blocos_humanos(bloco)}).\n")
                 else:
-                    print(f"Operação {idx+1} => Sucesso\nO processo {pid} criou o arquivo {op['nome']}.")
+                    print(f"Operação {idx+1} => Sucesso\nO processo {pid} criou o arquivo {op['nome']}.\n")
             else:
-                print(f"Operação {idx+1} => Falha\nO processo {pid} não pode criar o arquivo {op['nome']} (falta de espaço).")
+                print(f"Operação {idx+1} => Falha\nO processo {pid} não pode criar o arquivo {op['nome']} (falta de espaço).\n")
     elif op['op'] == 'delete':
         if process is None:
-            print(f"Operação {idx+1} => Falha\nO processo {pid} não existe.")
+            print(f"Operação {idx+1} => Falha\nO processo {pid} não existe.\n")
         else:
             deleted = filesystem.delete_file(op['nome'], pid, is_real_time)
             if deleted:
-                print(f"Operação {idx+1} => Sucesso\nO processo {pid} deletou o arquivo {op['nome']}.")
+                print(f"Operação {idx+1} => Sucesso\nO processo {pid} deletou o arquivo {op['nome']}.\n")
             else:
                 if op['nome'] not in filesystem.files:
-                    print(f"Operação {idx+1} => Falha\nO processo {pid} não pode deletar o arquivo {op['nome']} porque ele não existe.")
+                    print(f"Operação {idx+1} => Falha\nO processo {pid} não pode deletar o arquivo {op['nome']} porque ele não existe.\n")
                 else:
-                    print(f"Operação {idx+1} => Falha\nO processo {pid} não pode deletar o arquivo {op['nome']}.")
+                    print(f"Operação {idx+1} => Falha\nO processo {pid} não pode deletar o arquivo {op['nome']}.\n")
 
 filesystem.print_disk_map()
