@@ -66,7 +66,6 @@ class Processes:
     
     if resource_manager.allocate(self):
       self.has_resources = True
-      queues.add_process(self, is_new=False)
       return True
     Processes.blocked_processes.append(self)
 
