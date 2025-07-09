@@ -116,7 +116,10 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
       if current_process_in_cpu.queue == 0:
         processing_time = current_process_in_cpu.total_time
       else:
-        processing_time = current_process_in_cpu.queue * Processes.quantum
+        if (current_process_in_cpu.total_time - current_process_in_cpu.processing_time < current_process_in_cpu.queue * Processes.quantum):
+          processing_time = current_process_in_cpu.total_time - current_process_in_cpu.processing_time
+        else:
+          processing_time = current_process_in_cpu.queue * Processes.quantum
         if current_process_in_cpu.queue < 3:
           current_process_in_cpu.queue += 1
         else:
