@@ -85,8 +85,7 @@ while len(Processes.all_processes) > 0 or Queues.count > 0:
       if current_process_in_cpu.processing_time < current_process_in_cpu.total_time:
         queues.add_process(current_process_in_cpu, False)
       else:
-        current_process_in_cpu.close_process(memory_manager, resource_manager)
-        Queues.count -= 1
+        current_process_in_cpu.close_process(memory_manager, resource_manager, queues)
 
     current_process_in_cpu = queues.get_next_process()
 
