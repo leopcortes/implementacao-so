@@ -78,7 +78,7 @@ class Processes:
           except ValueError:
             pass
           self.has_resources = True
-          queues.add_process(self, is_new=False)
+          queues.add_process(self, new_process=False)
           break
 
     # cria e inicia a thread que vai tentar alocar os recursos futuramente
