@@ -4,6 +4,7 @@ from queues_module import Queues
 from files_module import FileSystem
 from memory_module import MemoryManager
 from resources_module import ResourcesManager
+import time
 
 if len(sys.argv) != 3:
   sys.exit(1)
@@ -63,6 +64,7 @@ first = False
 queues = Queues()
 
 while len(Processes.all_processes) > 0 or Queues.count > 0:
+  time.sleep(0.01)  # aguarda 10ms
   if len(Processes.all_processes) > 0:
     Processes.processes_that_arrived = [process for process in Processes.all_processes if process.arrival_time <= cpu_total_quantums]
     Processes.all_processes = [process for process in Processes.all_processes if process.arrival_time > cpu_total_quantums]

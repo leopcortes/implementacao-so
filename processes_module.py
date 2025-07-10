@@ -1,6 +1,7 @@
 import time
 import threading
 
+
 class Processes:
   quantum = 1 #milissegundos
   pid = 0
@@ -60,9 +61,9 @@ class Processes:
   def get_all_resources(self, queues, resource_manager):
     # Tenta obter o recurso. Caso não consiga, coloca o processo na lista de bloqueados (Processes.blocked_processes) e cria a thread 
     # que vai chamar a função para tentar obter o recurso. Quando conseguir, chamar a função queues.add_process(*processo) para colocar 
-    # o processo de volta a lista de prontos e remover da lista de bloqueados.
-    if self.priority == 0:
-      return True
+    # o processo de volta a lista de prontos e remover da lista de bloqueados.    
+    if self.modem > 1 or self.scanner > 1 or self.printer > 2 or self.disk > 2:
+      return False
     
     if resource_manager.allocate(self):
       self.has_resources = True
@@ -78,7 +79,7 @@ class Processes:
           except ValueError:
             pass
           self.has_resources = True
-          queues.add_process(self, new_process=False)
+          queues.add_process(self, False)
           break
 
     # cria e inicia a thread que vai tentar alocar os recursos futuramente
@@ -90,5 +91,6 @@ class Processes:
   def close_process(self, memory_manager, resource_manager, queues):
     resource_manager.release(self.pid)
     memory_manager.deallocate(self.pid)
-    queues.remove_process()
+    from queues_module import Queues
+    Queues.count -= 1
     

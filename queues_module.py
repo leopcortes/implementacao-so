@@ -105,6 +105,3 @@ class Queues:
     Queues.user_first_priority.sort(key=lambda process: (process.priority, process.arrival_time))
     Queues.user_second_priority.sort(key=lambda process: (process.priority, process.arrival_time))
     Queues.user_third_priority.sort(key=lambda process: (process.priority, process.arrival_time))
-
-  def remove_process(self):
-    Queues.count -= 1
