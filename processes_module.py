@@ -83,7 +83,7 @@ class Processes:
           break
 
     # cria e inicia a thread que vai tentar alocar os recursos futuramente
-    t = threading.Thread(target=try_allocate)
+    t = threading.Thread(target=try_allocate, daemon=True)
     t.start()
 
     return False
